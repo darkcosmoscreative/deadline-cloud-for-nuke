@@ -13,6 +13,7 @@ import nuke
 from deadline.client.job_bundle.submission import AssetReferences
 from deadline.client.exceptions import DeadlineOperationError
 from deadline.nuke_util import ocio as nuke_ocio
+from deadline.nuke_util import plugins as nuke_plugins
 
 FRAME_REGEX = re.compile(r"(#+)|%(\d*)d", re.IGNORECASE)
 FILE_KNOB_CLASS = "File_Knob"
@@ -90,6 +91,12 @@ def get_scene_asset_references() -> AssetReferences:
 
         for search_path in ocio_config_search_paths:
             asset_references.input_directories.add(search_path)
+
+    # gather and include custom plugins
+    plugin_paths = nuke_plugins.get_custom_plugin_paths()
+
+    for plugin_path in plugin_paths:
+        asset_references.input_directories.add(plugin_path)
 
     return asset_references
 
