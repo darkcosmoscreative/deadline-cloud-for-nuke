@@ -33,6 +33,7 @@ except ImportError:  # pragma: no cover
 
 try:
     from nuke_util import ocio as nuke_ocio  # type: ignore[import]
+    from nuke_util import plugins as nuke_plugins
 except ImportError:
     from deadline.nuke_util import ocio as nuke_ocio
 
@@ -62,7 +63,12 @@ class NukeClient(_HTTPClientInterface):
             if nuke_ocio.is_custom_config_enabled():
                 self._map_ocio_config()
 
+        def map_plugin_dirs():
+            """Make sure the plugin paths are mapped within the instance"""
+            self._map_plugin_dirs()
+
         nuke.addBeforeRender(verify_ocio_config)
+        nuke.addBeforeRender(map_plugin_dirs)
         nuke.addBeforeRender(ensure_output_dir)
         nuke.addFilenameFilter(self.map_path)
 
@@ -141,6 +147,15 @@ class NukeClient(_HTTPClientInterface):
             ocio_config.serialize(updated_ocio_config_path)
 
             nuke_ocio.set_custom_config_path(updated_ocio_config_path)
+    
+    def _map_plugin_dirs(self):
+        """Point nuke to the updated plugin paths"""
+        plugin_dirs = nuke_plugins.get_custom_plugin_paths()
+        updated_dirs = []
+        for plugin_dir in plugin_dirs:
+            updated_dirs.append(self.map_path(plugin_dir))
+        nuke_plugins.set_custom_plugin_paths(updated_dirs)
+
 
 
 def main():

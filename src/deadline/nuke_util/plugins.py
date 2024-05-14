@@ -1,7 +1,7 @@
+from __future__ import annotationsimport nuke
+
 import nuke
 import os
-
-from __future__ import annotations
 from os.path import dirname
 from sys import platform
 
@@ -18,3 +18,8 @@ def get_custom_plugin_paths() -> list[str]:
         install_path = dirname(dirname(dirname(nuke.EXE_PATH)))
 
     return [path.replace("\\","/") for path in plugin_dirs if install_path not in path]
+
+def set_custom_plugin_paths(plugin_paths: list[str]) -> None:
+    """Set the knob on the root settings to update the OCIO config"""
+    for path in plugin_paths:
+        nuke.pluginAddPath(path)
