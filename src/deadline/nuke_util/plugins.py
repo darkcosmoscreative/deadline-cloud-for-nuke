@@ -1,4 +1,4 @@
-from __future__ import annotationsimport nuke
+from __future__ import annotations
 
 import nuke
 import os
